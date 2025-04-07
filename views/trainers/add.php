@@ -1,4 +1,4 @@
-<h2>Add New Trainer</h2>
+<h2 style="margin-top: 20px; margin-bottom: 20px;">Add New Trainer</h2>
 <div class="form-container">
     <?php if(isset($error)): ?>
         <div class="error-message"><?php echo $error; ?></div>
@@ -39,7 +39,7 @@
             <input type="text" name="specialization" id="specialization" required>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" style="display: flex; justify-content: flex-end; gap: 10px;" >
             <input type="submit" name="submit" value="Add Trainer" class="btn">
             <a href="index.php?page=trainers" class="btn">Cancel</a>
         </div>

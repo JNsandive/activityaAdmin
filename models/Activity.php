@@ -1,45 +1,25 @@
 <?php
-class Activity {
-    private $db;
-    private $table = 'activities';
+require_once 'BaseModel.php';
+require_once 'ActivityInterface.php';
 
-    public $id;
-    public $name;
-    public $description;
-    public $benefits;
-    public $price;
+/**
+ * Activity Model Class
+ * Handles all operations related to the 'activities' table
+ */
+class Activity extends BaseModel implements ActivityInterface
+{
+    public int|null $id = null;
+    public string $name;
+    public string $description;
+    public string $benefits;
+    public string $price;
 
-    public function __construct($database) {
-        $this->db = $database;
+    /**
+     * Constructor - Injects DB and sets table
+     */
+    public function __construct(Database $db)
+    {
+        parent::__construct($db, 'activities');
     }
 
-    // Get total count
-    public function countAll() {
-        $this->db->query("SELECT COUNT(*) as total FROM {$this->table}");
-        return $this->db->single()->total;
-    }
-
-    // Get paginated activities
-    public function getPaginated($limit, $offset) {
-        $query = 'SELECT * FROM ' . $this->table . ' ORDER BY name LIMIT :limit OFFSET :offset';
-        $this->db->query($query);
-        $this->db->bind(':limit', (int) $limit, PDO::PARAM_INT);
-        $this->db->bind(':offset', (int) $offset, PDO::PARAM_INT);
-        return $this->db->resultSet();
-    }
-    
-
-    public function getById($id) {
-        $this->db->query("SELECT * FROM {$this->table} WHERE id = :id");
-        $this->db->bind(':id', $id);
-        return $this->db->single();
-    }
-
-    public function count() {
-        $query = 'SELECT COUNT(*) as total FROM ' . $this->table;
-        $this->db->query($query);
-        return $this->db->single()->total;
-    }
-    
 }
-?>

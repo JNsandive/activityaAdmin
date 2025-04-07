@@ -1,7 +1,8 @@
-<h2>Trainer Details</h2>
+<h2 style="margin-top: 20px; margin-bottom: 20px;" >Trainer Details</h2>
 <div class="trainer-details">
     <?php if($trainer): ?>
         <h3><?php echo htmlspecialchars($trainer->name); ?></h3>
+        <br>
         <div class="detail-row">
             <strong>Email:</strong>
             <p><?php echo htmlspecialchars($trainer->email); ?></p>
@@ -22,7 +23,7 @@
             <strong>Specialization:</strong>
             <p><?php echo htmlspecialchars($trainer->specialization); ?></p>
         </div>
-        <div class="actions">
+        <div class="actions" style="display: flex; justify-content: flex-end; gap: 10px;">
             <a href="index.php?page=edit_trainer&id=<?php echo $trainer->id; ?>" class="btn">Edit</a>
             <a href="index.php?page=trainers" class="btn">Back to Trainers</a>
         </div>
