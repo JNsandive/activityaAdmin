@@ -1,5 +1,6 @@
 <?php
 require_once 'config/db.php';
+require_once 'utils/Logger.php';
 
 try {
     $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT;
@@ -38,6 +39,8 @@ try {
     }
 
 } catch (PDOException $e) {
+    Logger::error('BootstrapError', $e->getMessage());
+
     echo "Database bootstrap error: " . $e->getMessage();
     exit;
 }

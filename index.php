@@ -1,12 +1,11 @@
 <?php
-// Start session
 session_start();
 
-// Include configuration and core files
+// Bootstrap & Config
 require_once 'bootstrap.php';
 require_once 'config/db.php';
 
-// Include models and interfaces
+// Models & Interfaces
 require_once 'models/BaseModel.php';
 require_once 'models/ActivityInterface.php';
 require_once 'models/TrainerInterface.php';
@@ -14,21 +13,16 @@ require_once 'models/Database.php';
 require_once 'models/Activity.php';
 require_once 'models/Trainer.php';
 
-// Include services
+// Services
 require_once 'services/TrainerService.php';
 require_once 'services/ActivityService.php';
 
+require_once 'utils/Logger.php';
 
-// Instantiate database and services
+// DB + Service Init
 $database = new Database();
-
-$activityModel = new Activity($database);
-$activityService = new ActivityService($activityModel);
-
-$trainerModel = new Trainer($database);
-$trainerService = new TrainerService($trainerModel);
-
-
+$activityService = new ActivityService(new Activity($database));
+$trainerService = new TrainerService(new Trainer($database));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,144 +41,142 @@ $trainerService = new TrainerService($trainerModel);
             <?php
             $page = $_GET['page'] ?? 'home';
 
-            switch ($page) {
-                case 'activities':
-                    $perPage = 12;
-                    $pageNum = (isset($_GET['p']) && is_numeric($_GET['p']) && $_GET['p'] > 0) ? (int) $_GET['p'] : 1;
-                    $totalActivities = $activityService->getTotal();
-                    $totalPages = ceil($totalActivities / $perPage);
-                    $offset = ($pageNum - 1) * $perPage;
+            try {
+                switch ($page) {
+                    case 'activities':
+                        $perPage = 12;
+                        $pageNum = (isset($_GET['p']) && is_numeric($_GET['p']) && $_GET['p'] > 0) ? (int) $_GET['p'] : 1;
+                        $totalActivities = $activityService->getTotal();
+                        $totalPages = ceil($totalActivities / $perPage);
+                        $offset = ($pageNum - 1) * $perPage;
+                        $activities = $activityService->getPaginatedFormatted($perPage, $offset);
+                        include_once 'views/activities/list.php';
+                        break;
 
-                    $activities = $activityService->getPaginatedFormatted($perPage, $offset);
-
-                    include_once 'views/activities/list.php';
-                    break;
-
-                case 'view_activity':
-                    if (isset($_GET['id'])) {
+                    case 'view_activity':
+                        if (!isset($_GET['id'])) {
+                            header('Location: index.php?page=activities');
+                            exit();
+                        }
                         $activity = $activityService->getOneById($_GET['id']);
                         include_once 'views/activities/view.php';
-                    } else {
-                        header('Location: index.php?page=activities');
-                        exit();
-                    }
-                    break;
+                        break;
 
+                    case 'trainers':
+                        $perPage = 12;
+                        $pageNum = (isset($_GET['p']) && is_numeric($_GET['p']) && $_GET['p'] > 0) ? (int) $_GET['p'] : 1;
+                        $totalTrainers = $trainerService->getTotal();
+                        $totalPages = ceil($totalTrainers / $perPage);
+                        $offset = ($pageNum - 1) * $perPage;
+                        $trainers = $trainerService->getPaginatedFormatted($perPage, $offset);
+                        include_once 'views/trainers/list.php';
+                        break;
 
-                case 'trainers':
-                    $perPage = 12;
-                    $pageNum = (isset($_GET['p']) && is_numeric($_GET['p']) && $_GET['p'] > 0) ? (int) $_GET['p'] : 1;
-                    $totalTrainers = $trainerService->getTotal();
-                    $totalPages = ceil($totalTrainers / $perPage);
-                    $offset = ($pageNum - 1) * $perPage;
-
-                    $trainers = $trainerService->getPaginatedFormatted($perPage, $offset);
-
-                    include_once 'views/trainers/list.php';
-                    break;
-
-                case 'view_trainer':
-                    if (isset($_GET['id'])) {
+                    case 'view_trainer':
+                        if (!isset($_GET['id'])) {
+                            header('Location: index.php?page=trainers');
+                            exit();
+                        }
                         $trainer = $trainerService->getOneById($_GET['id']);
                         include_once 'views/trainers/view.php';
-                    } else {
-                        header('Location: index.php?page=trainers');
-                        exit();
-                    }
-                    break;
+                        break;
 
-                case 'add_trainer':
-                    $error = null;
-                    $success = null;
+                    case 'add_trainer':
+                        $error = null;
+                        $success = null;
 
-                    if (isset($_POST['submit'])) {
-                        $name = trim($_POST['name']);
-                        $email = trim($_POST['email']);
-                        $location = trim($_POST['location']);
-                        $certifications = trim($_POST['certifications']);
-                        $years = trim($_POST['years']);
-                        $specialization = trim($_POST['specialization']);
+                        if (isset($_POST['submit'])) {
+                            $name = trim($_POST['name']);
+                            $email = trim($_POST['email']);
+                            $location = trim($_POST['location']);
+                            $certifications = trim($_POST['certifications']);
+                            $years = trim($_POST['years']);
+                            $specialization = trim($_POST['specialization']);
 
-                        $errors = [];
+                            $errors = [];
 
-                        if ($name === '') $errors[] = "Full Name is required.";
-                        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Valid Email is required.";
-                        if ($location === '') $errors[] = "Location is required.";
-                        if ($certifications === '') $errors[] = "Certifications are required.";
-                        if (!is_numeric($years) || (int)$years < 0) $errors[] = "Years of Experience must be a positive number.";
-                        if ($specialization === '') $errors[] = "Specialization is required.";
+                            if ($name === '') $errors[] = "Full Name is required.";
+                            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Valid Email is required.";
+                            if ($location === '') $errors[] = "Location is required.";
+                            if ($certifications === '') $errors[] = "Certifications are required.";
+                            if (!is_numeric($years) || (int)$years < 0) $errors[] = "Years of Experience must be a positive number.";
+                            if ($specialization === '') $errors[] = "Specialization is required.";
 
-                        if (!empty($errors)) {
-                            $error = implode('<br>', $errors);
-                        } else {
-                            $success = $trainerService->createTrainer($_POST)
-                                ? "Trainer added successfully!"
-                                : "Error adding trainer.";
+                            if (!empty($errors)) {
+                                $error = implode('<br>', $errors);
+                            } else {
+                                $success = $trainerService->createTrainer($_POST)
+                                    ? "Trainer added successfully!"
+                                    : "Error adding trainer.";
+                            }
                         }
-                    }
 
-                    include_once 'views/trainers/add.php';
-                    break;
+                        include_once 'views/trainers/add.php';
+                        break;
 
+                    case 'edit_trainer':
+                        $error = null;
+                        $success = null;
 
-                case 'edit_trainer':
-                    $error = null;
-                    $success = null;
-
-                    if (!isset($_GET['id'])) {
-                        header('Location: index.php?page=trainers');
-                        exit();
-                    }
-
-                    if (isset($_POST['submit'])) {
-                        $name = trim($_POST['name']);
-                        $email = trim($_POST['email']);
-                        $location = trim($_POST['location']);
-                        $certifications = trim($_POST['certifications']);
-                        $years = trim($_POST['years']);
-                        $specialization = trim($_POST['specialization']);
-
-                        $errors = [];
-
-                        if ($name === '') $errors[] = "Full Name is required.";
-                        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Valid Email is required.";
-                        if ($location === '') $errors[] = "Location is required.";
-                        if ($certifications === '') $errors[] = "Certifications are required.";
-                        if (!is_numeric($years) || (int)$years < 0) $errors[] = "Years of Experience must be a positive number.";
-                        if ($specialization === '') $errors[] = "Specialization is required.";
-
-                        if (!empty($errors)) {
-                            $error = implode('<br>', $errors);
-                        } else {
-                            $success = $trainerService->updateTrainer($_GET['id'], $_POST)
-                                ? "Trainer updated successfully!"
-                                : "Error updating trainer.";
+                        if (!isset($_GET['id'])) {
+                            header('Location: index.php?page=trainers');
+                            exit();
                         }
-                    }
 
-                    $trainer = $trainerService->getOneById($_GET['id']);
-                    include_once 'views/trainers/edit.php';
-                    break;
+                        if (isset($_POST['submit'])) {
+                            $name = trim($_POST['name']);
+                            $email = trim($_POST['email']);
+                            $location = trim($_POST['location']);
+                            $certifications = trim($_POST['certifications']);
+                            $years = trim($_POST['years']);
+                            $specialization = trim($_POST['specialization']);
 
+                            $errors = [];
 
-                case 'delete_trainer':
-                    if (isset($_GET['id'])) {
-                        if ($trainerService->deleteTrainer($_GET['id'])) {
-                            $_SESSION['message'] = "Trainer deleted successfully!";
-                        } else {
-                            $_SESSION['error'] = "Error deleting trainer.";
+                            if ($name === '') $errors[] = "Full Name is required.";
+                            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Valid Email is required.";
+                            if ($location === '') $errors[] = "Location is required.";
+                            if ($certifications === '') $errors[] = "Certifications are required.";
+                            if (!is_numeric($years) || (int)$years < 0) $errors[] = "Years of Experience must be a positive number.";
+                            if ($specialization === '') $errors[] = "Specialization is required.";
+
+                            if (!empty($errors)) {
+                                $error = implode('<br>', $errors);
+                            } else {
+                                $success = $trainerService->updateTrainer($_GET['id'], $_POST)
+                                    ? "Trainer updated successfully!"
+                                    : "Error updating trainer.";
+                            }
                         }
-                        header('Location: index.php?page=trainers');
-                        exit();
-                    } else {
-                        header('Location: index.php?page=trainers');
-                        exit();
-                    }
-                    break;
 
-                default:
-                    include_once 'views/home.php';
-                    break;
+                        $trainer = $trainerService->getOneById($_GET['id']);
+                        include_once 'views/trainers/edit.php';
+                        break;
+
+                    case 'delete_trainer':
+                        if (isset($_GET['id'])) {
+                            if ($trainerService->deleteTrainer($_GET['id'])) {
+                                $_SESSION['message'] = "Trainer deleted successfully!";
+                            } else {
+                                $_SESSION['error'] = "Error deleting trainer.";
+                            }
+                            header('Location: index.php?page=trainers');
+                            exit();
+                        }
+
+                    default:
+                        include_once 'views/home.php';
+                        break;
+                }
+            } catch (Throwable $e) {
+
+                // Log to file
+                Logger::error('IndexError', $e->getMessage());
+
+
+                echo "<div style='padding:1rem;background:#ffdddd;color:#900;border:1px solid #f00;'>
+            <strong>Something went wrong. Please try again later.</strong>
+        </div>";
             }
             ?>
         </main>

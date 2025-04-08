@@ -32,7 +32,7 @@ class Database {
             $this->conn = new PDO($dsn, $this->user, $this->pass, $options);
         } catch (PDOException $e) {
             $this->error = $e->getMessage();
-            die("❌ DB Connection Error: {$this->error}");
+            die("DB Connection Error: {$this->error}");
         }
     }
 
@@ -43,7 +43,7 @@ class Database {
         if ($this->conn) {
             $this->stmt = $this->conn->prepare($query);
         } else {
-            die("❌ Cannot prepare query. No DB connection.");
+            die("Cannot prepare query. No DB connection.");
         }
     }
 
