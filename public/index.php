@@ -2,22 +2,23 @@
 session_start();
 
 // Bootstrap & Config
-require_once 'bootstrap.php';
-require_once 'config/db.php';
+require_once __DIR__ . '/../private/bootstrap.php';
+require_once __DIR__ . '/../private/config/db.php';
 
 // Models & Interfaces
-require_once 'models/BaseModel.php';
-require_once 'models/ActivityInterface.php';
-require_once 'models/TrainerInterface.php';
-require_once 'models/Database.php';
-require_once 'models/Activity.php';
-require_once 'models/Trainer.php';
+require_once __DIR__ . '/../private/models/BaseModel.php';
+require_once __DIR__ . '/../private/models/ActivityInterface.php';
+require_once __DIR__ . '/../private/models/TrainerInterface.php';
+require_once __DIR__ . '/../private/models/Database.php';
+require_once __DIR__ . '/../private/models/Activity.php';
+require_once __DIR__ . '/../private/models/Trainer.php';
 
 // Services
-require_once 'services/TrainerService.php';
-require_once 'services/ActivityService.php';
+require_once __DIR__ . '/../private/services/TrainerService.php';
+require_once __DIR__ . '/../private/services/ActivityService.php';
 
-require_once 'utils/Logger.php';
+// Logger
+require_once __DIR__ . '/../private/utils/Logger.php';
 
 // DB + Service Init
 $database = new Database();

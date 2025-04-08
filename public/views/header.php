@@ -12,10 +12,10 @@
             <h1>ActiveAtHome - Admin Console</h1>
             <nav>
                 <ul>
-                    <li><a href="/activehome/index.php">Home</a></li>
-                    <li><a href="/activehome/index.php?page=activities">Display Activities</a></li>
-                    <li><a href="/activehome/index.php?page=trainers">Display Trainers</a></li>
-                    <li><a href="/activehome/index.php?page=add_trainer">Add New Trainer</a></li>
+                    <li><a href="/activehome/public/index.php">Home</a></li>
+                    <li><a href="/activehome/public/index.php?page=activities">Display Activities</a></li>
+                    <li><a href="/activehome/public/index.php?page=trainers">Display Trainers</a></li>
+                    <li><a href="/activehome/public/index.php?page=add_trainer">Add New Trainer</a></li>
                 </ul>
             </nav>
         </div>

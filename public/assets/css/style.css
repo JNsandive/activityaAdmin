@@ -5,7 +5,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   font-family: Arial, sans-serif;
@@ -117,7 +118,7 @@ header nav ul li a:hover {
 
 .activities-list ul li a:hover,
 .trainers-list ul li a:hover {
-  color: #e8491d;
+  color: #7c7c7c;
 }
 
 /* Detail View Cards */
@@ -185,7 +186,7 @@ header nav ul li a:hover {
 }
 
 .btn-edit {
-  background: #1dd524;
+  background: #ffaa00;
   color: white;
   padding: 5px 10px;
   border-radius: 3px;
@@ -200,6 +201,8 @@ header nav ul li a:hover {
   border-radius: 3px;
   text-decoration: none;
 }
+
+
 
 /* Messages */
 .error-message {
@@ -241,7 +244,7 @@ footer {
 }
 
 .pagination-summary {
-  background-color:  #35424a;
+  background-color: #35424a;
   color: #fff;
   padding: 6px 12px;
   border-radius: 4px;
